@@ -1,0 +1,132 @@
+Documentation for superpy.py 
+
+Superpy is an application for keeping inventory of a supermarket.
+It supports the following options: report inventory, buy a product, sell a product, report revenue for a day and report profit for a month.
+If you want to reset the application, remove the change.log and the inventory.csv files from its directory.
+Superpy is a command line tool, it's usage in short is the following:
+usage:  This program supports the below commands. Please see --help for details on the diffrent options.
+        inventory -d [YYYY-MM-dd]
+        buy -p -c -P -e
+        sell -p -c -P
+        advance-time -t
+        report-revenue -d [YYYY-MM-dd]
+        report-profit -d [YYYY-MM]
+
+positional arguments:
+  command [inventory, buy, sell, advance-time, report-revenue, report-profit]
+
+options:
+  -h, --help            show this help message and exit
+  -d , --date           Specify the date for the inventory (format: YYYY-MM-dd)
+  -p , --product-name   Use this option to specify the name of the product (string)
+  -c , --count          Use this option to specify of the amount bought or sold (integer)
+  -P , --price          Use this option to specify the price when buying or selling (float)
+  -e , --expiration-date
+                        Use this option to specify the expiration date of products when buying (format: YYYY-MM-dd)
+  -t , --time           Use this option to specify the number of days you want to advance (integer). This option accepts
+                        positive and negative numbers as well, but you can not set the internal date prior to the actual date.    
+                        This will be revised upon the invention of time travel
+						
+
+Usage example:
+
+We initialize the application by the inventory command: (however, any command will initialize the files)
+python superpy.py inventory
+
+Response:
+Showing the inventory for  2022-10-31
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
++--------------+-------+--------------+-----------------+
+
+Buying 4 counts of apples for 3.2 per piece with an expiration date of 2022-11-11:
+python superpy.py buy -p apple -c 4 -P 3.2 -e 2022-11-11
+
+Response:
+[*] buy command executed
+
+Running the inventory again shows we do in fact have the apples on inventory:
+
+Showing the inventory for  2022-10-31
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
+| apple        | 4     | 3.200        | 2022-11-11      |
++--------------+-------+--------------+-----------------+
+
+Let's advance time by one day:
+python superpy.py advance-time -t 1
+
+Response:
+[*] advance time command executed
+
+If we run inventory again, we can see that the date has been advanced:
+
+Showing the inventory for  2022-11-01
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
+| apple        | 4     | 3.200        | 2022-10-22      |
++--------------+-------+--------------+-----------------+
+
+Now let's sell an apple:
+command: python superpy.py sell -p apple -P 7.0
+
+Response:
+[*] sell command executed
+
+Inventory shows we now only have 3 apples:
+Showing the inventory for  2022-11-01
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
+| apple        | 3     | 3.200        | 2022-11-11      |
++--------------+-------+--------------+-----------------+
+
+Let's advance the time by 15 days:
+python superpy.py advance-time -t 15
+
+Inventory now shows no products - because the apples have expired:
+Showing the inventory for  2022-11-26
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
++--------------+-------+--------------+-----------------+
+
+However, getting the inventory for the 10th of November will show there were apples ready to sell:
+python superpy.py inventory -d 2022-11-10
+
+Showing the inventory for  2022-11-10
++--------------+-------+--------------+-----------------+
+| product name | count | buying price | expiration date |
++==============+=======+==============+=================+
+| apple        | 3     | 3.200        | 2022-11-11      |
++--------------+-------+--------------+-----------------+
+
+
+We can now advance time back to the 10th:
+python superpy.py advance-time -t -16
+
+Let's sell all the apples by running the below command 3 times:
+python superpy.py sell -p apple -P 7.0
+
+If you run this command again, you will get an error, as all apples have been sold:
+response: Product is not on stock to sell.
+
+(even if they were sold on future dates, if the current inventory has apples to sell, but the apples were already sold on future dates, you will get an error.)
+
+Now let's see how much revenue we made on today:
+python superpy.py report-revenue
+
+response: The revenue for 2022-10-31 is 28.0
+
+Finally, let's see the profits we made in November:
+python superpy.py report-profit -d 2022-11
+
+First, you will get a chart, showing the cash-flow: the blue part is the income, the red part is the expense for the day.
+After closing this additional window, the application will also provide the data in text:
+
+The income for 2022-11 was 28.0
+The expenditure for 2022-11 was 0
+The profits for 2022-10 were 28.0
